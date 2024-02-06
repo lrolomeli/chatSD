@@ -1,11 +1,7 @@
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 // Remote interface
 interface ChatService extends Remote {
