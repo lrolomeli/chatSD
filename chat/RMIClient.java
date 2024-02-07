@@ -2,10 +2,11 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
+//import AESCS.AESCS;
 
 // Remote interface
 interface ChatService extends Remote {
-    String sendMessage(String message, String sender) throws RemoteException;
+    String sendMessage(String user, String message, String dest) throws RemoteException;
     void registerClient(String clientName, ChatService client) throws RemoteException;
     void unregisterClient(String clientName) throws RemoteException;
 }
@@ -16,9 +17,16 @@ class ChatClient extends UnicastRemoteObject implements ChatService {
     }
 
     @Override
-    public String sendMessage(String message, String sender) throws RemoteException {
+    public String sendMessage(String user, String message, String dest) throws RemoteException {
         // This is called by other clients through the server when they send a message
-        System.out.println("Received message: " + message);
+        try{
+            Client client = new Client();
+            client.initFromStrings("CHuO1Fjd8YgJqTyapibFBQ==","e3IYYJC2hxe24/EO");
+            String decryptedMessage = client.decrypt(message);
+            System.out.println("\n"+ user+": " + decryptedMessage);
+        }catch(Exception e){
+
+        }
         return null;
     }
 
@@ -55,15 +63,21 @@ public class RMIClient{
                 ChatClient chatClient = new ChatClient();
                 java.rmi.Naming.rebind(user, chatClient);
 
+                Server server = new Server();
+                server.initFromStrings("CHuO1Fjd8YgJqTyapibFBQ==", "e3IYYJC2hxe24/EO");
+
                 // after the cast we can call it's methods
                 client.registerClient(user, client);
                 System.out.print("Type: ");
                 String msg = input.nextLine();
+                String encryptedMessage = server.encrypt(msg);
                 do{
-                    String reply = client.sendMessage(user + ": " + msg, dest);
+                    String reply = client.sendMessage(user, encryptedMessage, dest);
                     System.out.print("Type: ");
                     msg = input.nextLine();
+                    encryptedMessage = server.encrypt(msg);
                 }while(!msg.equals("bye"));
+                input.close();
                 client.unregisterClient(user);
 
             } catch (Exception e) {

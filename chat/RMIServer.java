@@ -3,11 +3,10 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
-import java.rmi.registry.LocateRegistry;
 
 // Remote interface
 interface ChatService extends Remote {
-    String sendMessage(String message, String sender) throws RemoteException;
+    String sendMessage(String user, String message, String dest) throws RemoteException;
     void registerClient(String clientName, ChatService client) throws RemoteException;
     void unregisterClient(String clientName) throws RemoteException;
 }
@@ -20,7 +19,7 @@ class ChatServiceImpl extends UnicastRemoteObject implements ChatService {
     }
 
     @Override
-    public String sendMessage(String message, String sender) throws RemoteException {
+    public String sendMessage(String user, String message, String dest) throws RemoteException {
         // Simulate some server logic
         // This method is executed we get the message from a client
         // and we know who is the client and who to send the message
@@ -34,10 +33,10 @@ class ChatServiceImpl extends UnicastRemoteObject implements ChatService {
         // Avoid sending the message back to the sender
         // Locate Registry in the host
         try{
-            ChatService chatService = (ChatService) java.rmi.Naming.lookup("rmi://localhost/"+sender);
+            ChatService chatService = (ChatService) java.rmi.Naming.lookup("rmi://localhost/"+dest);
             // Get the reference of the object in the RMI
   
-            chatService.sendMessage(message, sender);
+            chatService.sendMessage(user, message, dest);
 
         
         }catch(Exception e){
