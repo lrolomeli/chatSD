@@ -6,9 +6,8 @@ import java.util.Map;
 
 // Remote interface
 interface ChatService extends Remote {
-    String sendMessage(String user, String message, String dest) throws RemoteException;
-    void registerClient(String clientName, ChatService client) throws RemoteException;
-    void unregisterClient(String clientName) throws RemoteException;
+    String sendMessage(String user, String message, String dest, String ipaddr) throws RemoteException;
+    boolean isUserRegistered(String user, String password) throws RemoteException;
 }
 
 class ChatServiceImpl extends UnicastRemoteObject implements ChatService {
@@ -19,7 +18,7 @@ class ChatServiceImpl extends UnicastRemoteObject implements ChatService {
     }
 
     @Override
-    public String sendMessage(String user, String message, String dest) throws RemoteException {
+    public String sendMessage(String user, String message, String dest, String ipaddr) throws RemoteException {
         // Simulate some server logic
         // This method is executed we get the message from a client
         // and we know who is the client and who to send the message
@@ -33,10 +32,10 @@ class ChatServiceImpl extends UnicastRemoteObject implements ChatService {
         // Avoid sending the message back to the sender
         // Locate Registry in the host
         try{
-            ChatService chatService = (ChatService) java.rmi.Naming.lookup("rmi://localhost/"+dest);
+            ChatService chatService = (ChatService) java.rmi.Naming.lookup("rmi://"+ipaddr+"/"+dest);
             // Get the reference of the object in the RMI
   
-            chatService.sendMessage(user, message, dest);
+            chatService.sendMessage(user, message, dest, "localhost");
 
         
         }catch(Exception e){
@@ -46,19 +45,19 @@ class ChatServiceImpl extends UnicastRemoteObject implements ChatService {
 
     }
 
-    // Method to register a client with the server
-    @Override
-    public void registerClient(String clientName, ChatService client) {
-        connectedClients.put(clientName, client);
-        System.out.println("Client '" + clientName + "' connected.");
-    }
+	public boolean isUserRegistered(String user, String password) throws RemoteException {
+		String[] Password = {"123","456"};
+		String[] Username = {"Luis", "Alex"};
+		
+		for(int i=0; i<Username.length; i++) {
+			
+			if (user.equals(Username[i]) && password.equals(Password[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-    // Method to unregister a client from the server
-    @Override
-    public void unregisterClient(String clientName) {
-        connectedClients.remove(clientName);
-        System.out.println("Client '" + clientName + "' disconnected.");
-    }
 }
 
 public class RMIServer {

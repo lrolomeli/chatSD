@@ -2,13 +2,13 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
+import java.io.Console;
 //import AESCS.AESCS;
 
 // Remote interface
 interface ChatService extends Remote {
-    String sendMessage(String user, String message, String dest) throws RemoteException;
-    void registerClient(String clientName, ChatService client) throws RemoteException;
-    void unregisterClient(String clientName) throws RemoteException;
+    String sendMessage(String user, String message, String dest, String ipaddr) throws RemoteException;
+    boolean isUserRegistered(String user, String password) throws RemoteException;
 }
 
 class ChatClient extends UnicastRemoteObject implements ChatService {
@@ -17,7 +17,7 @@ class ChatClient extends UnicastRemoteObject implements ChatService {
     }
 
     @Override
-    public String sendMessage(String user, String message, String dest) throws RemoteException {
+    public String sendMessage(String user, String message, String dest, String ipaddr) throws RemoteException {
         // This is called by other clients through the server when they send a message
         try{
             Client client = new Client();
@@ -30,15 +30,11 @@ class ChatClient extends UnicastRemoteObject implements ChatService {
         return null;
     }
 
-    // Method to register a client with the server
     @Override
-    public void registerClient(String clientName, ChatService client) {
+    public boolean isUserRegistered(String user, String password) throws RemoteException {
+        return true;
     }
 
-    // Method to unregister a client from the server
-    @Override
-    public void unregisterClient(String clientName) {
-    }
 
 }
 
@@ -53,32 +49,44 @@ public class RMIClient{
                 // a ChatService object so we can use it as local object.
 
                 // Simulate client interaction
+                Console console = System.console();
                 Scanner input = new Scanner(System.in);
                 System.out.print("User: ");
                 String user = input.nextLine();
 
-                System.out.print("Who you want to talk to: ");
-                String dest = input.nextLine();
+                char[] passwordArray = console.readPassword("Enter your password: ");
+                String pass = new String(passwordArray);
 
                 ChatClient chatClient = new ChatClient();
                 java.rmi.Naming.rebind(user, chatClient);
+                
+                // after the cast we can call it's methods
+                if(client.isUserRegistered(user, pass)) {
+                    System.out.println("Access Granted! Welcome " + user);
+                }
+                else {
+                    System.out.println("I'm sorry thats an invalid Username or Password!");
+                }
+                java.util.Arrays.fill(passwordArray, ' ');
+                System.out.print("Who you want to talk to: ");
+                String dest = input.nextLine();
 
                 Server server = new Server();
                 server.initFromStrings("CHuO1Fjd8YgJqTyapibFBQ==", "e3IYYJC2hxe24/EO");
-
-                // after the cast we can call it's methods
-                client.registerClient(user, client);
-                System.out.print("Type: ");
+                
+                System.out.print("Enter a Msg: ");
                 String msg = input.nextLine();
                 String encryptedMessage = server.encrypt(msg);
+
                 do{
-                    String reply = client.sendMessage(user, encryptedMessage, dest);
-                    System.out.print("Type: ");
+
+                    String reply = client.sendMessage(user, encryptedMessage, dest, "localhost");
+                    System.out.print("Enter a Msg: ");
                     msg = input.nextLine();
                     encryptedMessage = server.encrypt(msg);
+
                 }while(!msg.equals("bye"));
                 input.close();
-                client.unregisterClient(user);
 
             } catch (Exception e) {
                 e.printStackTrace();
