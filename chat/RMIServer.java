@@ -1,8 +1,6 @@
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.Map;
 
 // Remote interface
 interface ChatService extends Remote {
@@ -11,7 +9,6 @@ interface ChatService extends Remote {
 }
 
 class ChatServiceImpl extends UnicastRemoteObject implements ChatService {
-    private Map<String, ChatService> connectedClients = new HashMap<>();
 
     public ChatServiceImpl() throws RemoteException {
         // Constructor

@@ -20,7 +20,7 @@ class ChatClient extends UnicastRemoteObject implements ChatService {
     public String sendMessage(String user, String message, String dest, String ipaddr) throws RemoteException {
         // This is called by other clients through the server when they send a message
         try{
-            Client client = new Client();
+            AESClient client = new AESClient();
             client.initFromStrings("CHuO1Fjd8YgJqTyapibFBQ==","e3IYYJC2hxe24/EO");
             String decryptedMessage = client.decrypt(message);
             System.out.println("\n"+ user+": " + decryptedMessage);
@@ -71,7 +71,7 @@ public class RMIClient{
                 System.out.print("Who you want to talk to: ");
                 String dest = input.nextLine();
 
-                Server server = new Server();
+                AESServer server = new AESServer();
                 server.initFromStrings("CHuO1Fjd8YgJqTyapibFBQ==", "e3IYYJC2hxe24/EO");
                 
                 System.out.print("Enter a Msg: ");
@@ -80,7 +80,7 @@ public class RMIClient{
 
                 do{
 
-                    String reply = client.sendMessage(user, encryptedMessage, dest, "localhost");
+                    client.sendMessage(user, encryptedMessage, dest, "localhost");
                     System.out.print("Enter a Msg: ");
                     msg = input.nextLine();
                     encryptedMessage = server.encrypt(msg);
