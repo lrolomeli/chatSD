@@ -36,13 +36,19 @@ public class Client {
         return d.decrypt(msg);
 	}
 	
-	public String login(Scanner in) throws Exception {
+	public String getUser(Scanner in) {
+		String user;
 		// Pedir usuario por consola,
         System.out.print("User: ");
-        String user = in.nextLine();
+        user = in.nextLine();
+        return user;
+	}
+	
+	public String getPassword(Scanner in) throws Exception {
+		String pass;
 		// Pedir contraseña por consola,
         Console console = System.console();
-        String pass;
+
         if (console != null) {
             char[] passwordArray = console.readPassword("Enter password: ");
             pass = new String(passwordArray);
@@ -51,8 +57,32 @@ public class Client {
             pass = in.nextLine();
         }
         
-        pass = Client.encrypt(pass);
-        
+        return Client.encrypt(pass);
+	}
+	
+
+	public String register(Scanner in) throws Exception {
+		String user, pass;
+		
+        user = getUser(in);
+        pass = getPassword(in);
+		
+        if(this.service.registerUser(user, pass)) {
+        	return user;
+        }
+        else
+        {
+            return null;
+        }
+		
+	}
+	
+	public String login(Scanner in) throws Exception {
+		String user, pass;
+		
+        user = getUser(in);
+        pass = getPassword(in);
+		
         if(this.service.authentication(user, pass)) {
         	return user;
         }
@@ -67,6 +97,9 @@ public class Client {
 
         System.out.print("Enter a Msg: ");
         String msg = in.nextLine();
+        if(msg.equals("q")) {
+        	return null;
+        }
         return Client.encrypt(msg);
 
 	}
@@ -75,6 +108,8 @@ public class Client {
 
         System.out.print("Who you want to talk to: ");
         String dest = in.nextLine();
+        
+        // if User is not registered in the database return null;
         
 		return dest;
 	}
@@ -88,28 +123,72 @@ public class Client {
 		String rmiService = "rmi://" + ipaddr + "/Chat" + user;
 		Naming.rebind(rmiService, chat);
 	}
+	
+	public void deregisterMethods(String user, String ipaddr) throws RemoteException, MalformedURLException, NotBoundException {
+		String rmiService = "rmi://" + ipaddr + "/Chat" + user;
+		Naming.unbind(rmiService);
+	}
 
-	public static void main(String [] args) throws Exception {
+	public static void main(String [] args) throws Exception 
+	{
 		
-		Client c = new Client();
-		Service s = c.getService();
+		Client client = new Client();
+		Service service = client.getService();
 		Scanner input = new Scanner(System.in);
+		String action;
 		String user, msg, dest, ipaddr;
 		
-		if(null != s) {
-			user = c.login(input);
+		if(null != service) 
+		{
 			
-			if(null != user) {
-				ipaddr = c.getIpAddress();
-				c.registerMethods(user,ipaddr);
-				//avisar al servidor que estas conectado
-				dest = c.whoToTalk(input);
-				msg = c.askForMsg(input);
-				s.sendMessage(user, msg, dest);
+			System.out.println("1) Login\n2) Register\nX) Exit");
+			action = input.nextLine();
+			if(action.equals("1")) {
+				user = client.login(input);
+				
+				if(null != user) {
+					
+					ipaddr = client.getIpAddress();
+					client.registerMethods(user,ipaddr);
+					//avisar al servidor que estas conectado
+					
+					do {
+						dest = client.whoToTalk(input);
+						//revisar si el usuario al que deseas hablar esta conectado
+						//isUserConnected(dest); //checa en la base de datos
+						//en el campo de status del usuario
+						
+						do {
+							msg = client.askForMsg(input);
+							if(null != msg)	{
+								service.sendMessage(user, msg, dest);
+							}
+							else {
+								System.out.println("You've left the conversation");
+							}
+							
+						} while(null != msg);
+							
+					}while(null != dest);
+					//avisar al servidor
+					
+					// desconectar al usuario
+					client.deregisterMethods(user,ipaddr);
+					
+				}
 			}
+			else if(action.equals("2")) {
+				
+			}
+			else {
+				
+			}				
+				
 		}
 		
-		
+		else {
+			System.out.println("Server not available");
+		}
 
 	}
 	

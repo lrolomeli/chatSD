@@ -48,5 +48,13 @@ public class ServiceImpl extends UnicastRemoteObject implements Service {
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean registerUser(String user, String password) throws Exception {
+
+		MySQLConnection c = new MySQLConnection();
+		c.storeUserInDB(user, password);
+		return false;
+	}
 
 }

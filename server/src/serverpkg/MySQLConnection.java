@@ -1,4 +1,4 @@
-package database;
+package serverpkg;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -32,17 +32,13 @@ public class MySQLConnection {
 
         return this.conn;
     }
-	
-	public static void main(String []args) throws SQLException{
-		MySQLConnection c = new MySQLConnection();
-		Connection conn = c.connectMySQL();
-		System.out.println("Succeed "+ c);
-		String user = "Luis";
-		String password = "123";
+    
+	public void storeUserInDB(String user, String password) throws SQLException {
+		System.out.println("Succeed "+ this.conn);
 		
         // SQL query to insert data into the table
         String sql = "INSERT INTO user (username, password) VALUES (?, ?)";
-        PreparedStatement preparedStatement = conn.prepareStatement(sql);
+        PreparedStatement preparedStatement = this.conn.prepareStatement(sql);
         
         // Set values for parameters
         preparedStatement.setString(1, user);
@@ -53,7 +49,6 @@ public class MySQLConnection {
         if (rowsInserted > 0) {
             System.out.println("A new user was inserted successfully!");
         }
-		
 	}
 
 }
