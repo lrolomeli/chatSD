@@ -10,6 +10,7 @@ public class ServiceImpl extends UnicastRemoteObject implements Service {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private MySQLConnection c;
 
 	protected ServiceImpl() throws RemoteException {
 		super();
@@ -19,6 +20,11 @@ public class ServiceImpl extends UnicastRemoteObject implements Service {
 	public String getCurrentIpAddress(String user) {
 		// Searching for it on DB
 		return "localhost";
+	}
+	
+	public void connectDatabase() {
+		this.c = new MySQLConnection();
+		this.c.connectMySQL();
 	}
 	
 	@Override
@@ -36,25 +42,24 @@ public class ServiceImpl extends UnicastRemoteObject implements Service {
 
 	@Override
 	public boolean authentication(String user, String password) throws Exception {
-		String[] Password = { "123", "456" };
-		String[] Username = { "Luis", "Alex" };
+
 		String decryptPass = Server.decrypt(password);
-
-		for (int i = 0; i < Username.length; i++) {
-
-			if (user.equals(Username[i]) && decryptPass.equals(Password[i])) {
-				return true;
-			}
+		
+		String dbPassword = this.c.readPassword(user);
+		String decryptedDBPassword = Server.decrypt(dbPassword);
+		
+		if(decryptedDBPassword.equals(decryptPass)) {
+			return true;
 		}
-		return false;
+		else {
+			return false;
+		}
+		
 	}
 	
 	@Override
 	public boolean registerUser(String user, String password) throws Exception {
-
-		MySQLConnection c = new MySQLConnection();
-		c.storeUserInDB(user, password);
-		return false;
+		return this.c.storeUserInDB(user, password);
 	}
 
 }

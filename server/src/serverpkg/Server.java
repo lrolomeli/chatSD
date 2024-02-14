@@ -14,9 +14,11 @@ public class Server {
 	
 	public static void main(String [] args) throws Exception {
 		ServiceImpl service = new ServiceImpl();
+		service.connectDatabase();
 		String rmiService = "rmi://localhost/Service";
 		LocateRegistry.createRegistry(1099);
 		Naming.rebind(rmiService, service);
+		
 		System.out.println("Server running...");
 	}
 	

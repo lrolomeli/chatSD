@@ -143,6 +143,7 @@ public class Client {
 			
 			System.out.println("1) Login\n2) Register\nX) Exit");
 			action = input.nextLine();
+			
 			if(action.equals("1")) {
 				user = client.login(input);
 				
@@ -178,6 +179,14 @@ public class Client {
 				}
 			}
 			else if(action.equals("2")) {
+				user = client.register(input);
+				
+				if(null != user) {
+					System.out.println(user + " welcome to chatsd");
+				}
+				else {
+					System.out.println("sorry, Something went wrong.");
+				}
 				
 			}
 			else {
@@ -189,6 +198,8 @@ public class Client {
 		else {
 			System.out.println("Server not available");
 		}
+		
+		System.out.println("CYA Hope to get from you soon!");
 
 	}
 	

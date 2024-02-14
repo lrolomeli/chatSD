@@ -3,6 +3,7 @@ package serverpkg;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MySQLConnection {
@@ -33,7 +34,7 @@ public class MySQLConnection {
         return this.conn;
     }
     
-	public void storeUserInDB(String user, String password) throws SQLException {
+	public boolean storeUserInDB(String user, String password) throws SQLException {
 		System.out.println("Succeed "+ this.conn);
 		
         // SQL query to insert data into the table
@@ -48,7 +49,31 @@ public class MySQLConnection {
         int rowsInserted = preparedStatement.executeUpdate();
         if (rowsInserted > 0) {
             System.out.println("A new user was inserted successfully!");
+            return true;
         }
+        return false;
+	}
+	
+	public String readPassword(String user) throws SQLException {
+		System.out.println("Succeed "+ this.conn);
+		
+        // SQL query to insert data into the table
+        String sql = "SELECT password FROM user WHERE username=?";
+        PreparedStatement stmt = this.conn.prepareStatement(sql);
+        // Set values for parameters
+        stmt.setString(1, user);
+        ResultSet rs = stmt.executeQuery();
+        
+        if (rs.next()) {
+            //Display values
+        	String pass = rs.getString("password");
+            System.out.print("Password: " + pass);
+            return pass;
+        }
+        else {
+        	return null;
+        }
+
 	}
 
 }
