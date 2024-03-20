@@ -1,7 +1,6 @@
 .metadata/
 bin/
 *.jar
-lib/
 .classpath
 .project
 .settings/
