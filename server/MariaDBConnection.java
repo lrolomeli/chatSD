@@ -210,7 +210,7 @@ public class MariaDBConnection {
 		
 		return users;
 	}
-	
+
 	public String readPassword(String user) {
 		System.out.println("Comparing passwords...");
 		
