@@ -190,7 +190,7 @@ public class MariaDBConnection {
 		System.out.println("Looking for users...");
 		String users = "";
 		// SQL query to insert data into the table
-		String sql = "SELECT * FROM user";
+		String sql = "SELECT username,status FROM user";
 		PreparedStatement stmt;
 		try {
 			stmt = this.conn.prepareStatement(sql);
@@ -201,7 +201,11 @@ public class MariaDBConnection {
 			while (rs.next()) {
 				//Display values
 				String username = rs.getString("username");
-				users += "User: " + username;
+				boolean status = rs.getBoolean("status");
+				if(status)
+					users += "User: " + username + "disconnected";
+				else
+					users += "User: " + username + "connected";
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -210,7 +214,7 @@ public class MariaDBConnection {
 		
 		return users;
 	}
-
+	
 	public String readPassword(String user) {
 		System.out.println("Comparing passwords...");
 		
