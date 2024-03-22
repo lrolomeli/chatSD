@@ -20,13 +20,8 @@ public class ChatImpl extends UnicastRemoteObject implements ChatInterface{
 	}
 
 	@Override
-	public int createChat(String arg0, String arg1) throws RemoteException {
-		return this.m.createChat(arg0, arg1);
-	}
-
-	@Override
-	public String loadMess() throws RemoteException {
-		return this.m.loadMess();
+	public String loadMess(int arg0) throws RemoteException {
+		return this.m.loadMess(arg0);
 	}
 
 	@Override
@@ -40,7 +35,7 @@ public class ChatImpl extends UnicastRemoteObject implements ChatInterface{
 	}
 
 	@Override
-	public boolean sendMessage(String arg0, String arg1, String arg2) throws RemoteException {
+	public boolean sendMessage(String arg0, String arg1, int arg2) throws RemoteException {
 		return this.m.sendMessage(arg0, arg1, arg2);
 	}
 

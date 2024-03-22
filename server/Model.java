@@ -28,13 +28,16 @@ public class Model {
 	}
 	
 	public int openChat(String arg0, String arg1) {
-		// TODO: 
-		return 0;
+		String firstFiveChars = arg1.substring(0, Math.min(arg1.length(), 5));
+		if(firstFiveChars.equals("grupo"))
+			return this.db.openChatGroup(arg0, arg1);
+		else
+			return this.db.openChat(arg0, arg1);
 	}
 	
-	public boolean sendMessage(String arg0, String arg1, String arg2) {
+	public boolean sendMessage(String msg, String sender, int chatId) {
 		// TODO: 
-		return false;
+		return this.db.insertMessage(sender, chatId, msg);
 	}
 	
 	public String userStatus() {
@@ -42,14 +45,8 @@ public class Model {
 		return null;
 	}
 	
-	public String loadMess() {
-		// TODO:
-		return null;
-	}
-	
-	public int createChat(String arg0, String arg1) {
-		// TODO:
-		return 0;
+	public String loadMess(int chat) {
+		return this.db.readMessages(chat);
 	}
 	
 	public boolean goOffline(String arg0) {
@@ -58,7 +55,7 @@ public class Model {
 	}
 	
 	public String decryptText(String text) {
-        return aes_d.decrypt(text);
+        return this.aes_d.decrypt(text);
 	}
 	
 	public void connectDB() {
