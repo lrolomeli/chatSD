@@ -11,15 +11,6 @@ public class Chat {
 		this.v = new View();
 	}
 	
-	public static void main(String[] args) {
-		Chat chat = new Chat();
-		
-		chat.register();
-		chat.login();
-		chat.sendMsgTo();
-		
-	}
-	
 	public String register() {
 		String user, pass;
 		
@@ -59,5 +50,13 @@ public class Chat {
 		this.c.sendMessage(msg, this.user, who);
 	}
 	
+	public static void main(String[] args) {
+		Chat chat = new Chat();
+		
+		chat.register();
+		chat.login();
+		chat.sendMsgTo();
+		
+	}
 	
 }

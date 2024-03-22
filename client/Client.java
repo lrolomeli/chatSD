@@ -21,11 +21,6 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-
-	public void runClient() {
-		
-
-	}
 	
 	public void stopClient(String user) {
 		try {
