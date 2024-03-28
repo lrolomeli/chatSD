@@ -48,4 +48,5 @@ public class ChatImpl extends UnicastRemoteObject implements ChatInterface{
 	public boolean changeStatus(int arg0, boolean st) throws RemoteException {
 		return this.m.changeStatus(arg0, st);
 	}
+
 }

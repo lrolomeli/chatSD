@@ -96,6 +96,18 @@ public class Client {
 		return false;
 	}
 	
+	public String getMessages(int chatId) {
+		try {
+			return this.chatRemObj.loadMess(chatId);
+			
+
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+	
 	public int getChatId(int usrid1, int usrid2) {
 		try {
 			return this.chatRemObj.openChat(usrid1 , usrid2);

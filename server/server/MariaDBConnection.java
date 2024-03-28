@@ -38,12 +38,46 @@ public class MariaDBConnection {
         }
     }
 
-    public void checkForNewMessages(int userId) {
+	public String readMessages(int chatId) {
+		System.out.println("Buscando Mensajes...");
+		String msgs="";
+        // SQL query to read data into the table
+		String sql = "SELECT * FROM message WHERE chat_id=? LIMIT 10";
+        PreparedStatement stmt;
+		try {
+			
+			stmt = this.conn.prepareStatement(sql);
+	        // Set values for parameters
+			stmt.setInt(1, chatId);
+			
+	        ResultSet rs = stmt.executeQuery();
+	        
+	        while (rs.next()) {
+	            //Display values
+	        	String sender_id = rs.getString("sender_id");
+	        	String message_text = rs.getString("message_text");
+	            msgs += "" + sender_id + ":" + message_text + "\n"; 
+	        }
+	        System.out.println(msgs);
+	        //return pass;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+
+		return msgs;
+	}
+    
+    public String checkForNewMessages(int userId) {
         try {
+        	// checa la ultima vez que reviso sus mensajes el usuario
             long lastCheckTimestamp = lastCheckTimestamps.getOrDefault(userId, 0L);
 
             // Query for new messages since the last check timestamp
-            String query = "SELECT * FROM message WHERE user_id = ? AND timestamp > ?";
+            // si los reviso hace 5 minutos el siguiente query debe devolver los mensajes
+            // que hayan llegado en estos 5 minutos
+            String query = "SELECT * FROM message WHERE sender_id = ? AND timestamp > ?";
             PreparedStatement statement = this.conn.prepareStatement(query);
             statement.setInt(1, userId);
             statement.setTimestamp(2, new Timestamp(lastCheckTimestamp));
@@ -52,15 +86,21 @@ public class MariaDBConnection {
             while (resultSet.next()) {
                 // Process new messages
                 int messageId = resultSet.getInt("message_id");
-                String messageContent = resultSet.getString("content");
+                String messageContent = resultSet.getString("message_text");
                 System.out.println("New message (ID: " + messageId + "): " + messageContent);
+                
+                return null;
             }
 
-            // Update last check timestamp
+            // La ultima vez que revise si habia mensajes nuevos para mi
+            // efectivamente estoy checando si hay mensajes nuevos para este usuario
+            // cada cuanto? 30 segundos podria ser 
             lastCheckTimestamps.put(userId, System.currentTimeMillis());
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
+        return null;
     }
     
 	public boolean storeUserInDB(String user, String password) {
@@ -267,36 +307,6 @@ public class MariaDBConnection {
 			return false;
 		}
 		return false;
-	}
-	
-	public String readMessages(int chatId) {
-		System.out.println("Buscando Mensajes...");
-		String msgs="";
-        // SQL query to read data into the table
-		String sql = "SELECT * FROM message WHERE chat_id=? ORDER BY timestamp ASC";
-        PreparedStatement stmt;
-		try {
-			stmt = this.conn.prepareStatement(sql);
-	        // Set values for parameters
-			stmt.setInt(1, chatId);
-			
-	        ResultSet rs = stmt.executeQuery();
-	        
-	        while (rs.next()) {
-	            //Display values
-	        	String sender_id = rs.getString("sender_id");
-	        	String message_text = rs.getString("message_text");
-	            msgs += "\n" + sender_id + ":" + message_text;   
-	        }
-	        System.out.println(msgs);
-	        //return pass;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-
-		return msgs;
 	}
 	
 	public String readUsers() {

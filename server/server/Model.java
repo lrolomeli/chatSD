@@ -21,7 +21,7 @@ public class Model {
 		if(null == dbpass) {
 			return 0;
 		}
-		else if(dbpass.equals(password)){
+		else if(decryptText(dbpass).equals(decryptText(password))){
 			return this.db.readUserId(user);
 		}
 		else
