@@ -18,6 +18,12 @@ public class View {
 		return dest;
 	}
 	
+	public String askGroupName() {
+        System.out.print("Enter the name of the group: ");
+        String msg = this.input.nextLine();
+        return msg;
+	}
+	
 	public String askForMsg() {
 
         System.out.print("Enter a Msg: ");
@@ -51,6 +57,31 @@ public class View {
         }
         
         return pass;
+	}
+	
+	private boolean verifyList(String users) {
+		return true;
+	}
+	
+	public int[] getUserList() {
+		
+        System.out.print("Cuales usuarios (ID's) seran parte del grupo: ");
+        String userlist = this.input.nextLine();
+        if(verifyList(userlist)) {
+    		String[] users = userlist.split(",");
+    		
+    		int[] usrArr = new int[users.length];
+    		
+    		for(int i=0;i<users.length;i++) {
+    			usrArr[i] = Integer.valueOf(users[i]);
+    		}
+    		
+        	return usrArr;
+        }
+        else {
+        	return null;	
+        }
+		
 	}
 	
 	public void printUsers(String users) {

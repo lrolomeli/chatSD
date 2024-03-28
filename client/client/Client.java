@@ -45,7 +45,7 @@ public class Client {
 		try {
 			return this.chatRemObj.registerUser(user, pass);
 		} catch (RemoteException e) {
-			System.out.println("Hubo un problema de comunicacion, compruebe su conexion.");
+			System.err.println("Hubo un problema de comunicacion, compruebe su conexion.");
 			e.printStackTrace();
 		}
 		return false;
@@ -111,6 +111,18 @@ public class Client {
 	public int getChatId(int usrid1, int usrid2) {
 		try {
 			return this.chatRemObj.openChat(usrid1 , usrid2);
+			
+
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
+		return 0;
+	}
+	
+	public int createGroup(String name, int[] users, int admin) {
+		try {
+			return this.chatRemObj.createGroup(name, users, admin);
 			
 
 		} catch (RemoteException e) {

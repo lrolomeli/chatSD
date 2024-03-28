@@ -30,6 +30,13 @@ public interface ChatInterface extends Remote {
     // de chat
     int openChat(int user_id, int chat) throws RemoteException;
     
+    // Crea un grupo...
+    // 1) crea un chat
+    // 2) crea un chat grupal
+    // 3) se asocian los integrantes al grupo
+    int createGroup(String name, int[] users, int admin) throws RemoteException;
+    
+    
     // Esta funcion hara una consulta de todos los usuarios registrados en 
     // la tabla de usuarios y devolvera el status [des]conectado de cada uno
     String userStatus() throws RemoteException;

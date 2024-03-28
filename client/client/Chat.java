@@ -5,7 +5,7 @@ public class Chat {
 	private Client c;
 	private View v;
 	private AES aes;
-	private int cchatid;
+	private int cchatid; //current chat ID
 	private String user;
 	private int userId;
 	
@@ -119,6 +119,20 @@ public class Chat {
 			
 	}
 	
+	public void createGroup() {
+		// group admin -> this.userId;
+		// group name -> ""
+		// chatid group -> create chat id return;
+		// register users to chat_membership;
+		// chatid & userid
+		String name = this.v.askGroupName();
+		int[] userlist = this.v.getUserList();
+		
+		this.cchatid = this.c.createGroup(name, userlist, this.userId);
+
+		System.out.println("chatid: "+this.cchatid);
+	}
+	
 	public void startApp() {
 		
 		register();
@@ -127,6 +141,7 @@ public class Chat {
 			changeStatus(getUserId(),true);
 			sendMsgTo();
 			getMessages();
+			
 		}
 		else {
 			

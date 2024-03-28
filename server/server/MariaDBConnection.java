@@ -165,52 +165,76 @@ public class MariaDBConnection {
 		return 0;
 	}
 	
-	public int addUsersToChat(int usr1, int usr2, int chatId) {
-		
-		System.out.println("Adding users to the chat...");
-		
-        // SQL query to insert data into the table
-        String sql = "INSERT INTO chat_membership (chat_id,user_id) VALUES (?,?)";
-        PreparedStatement pstmt;
-		
-        try {
-        	pstmt = this.conn.prepareStatement(sql);
+
+	private void insertGroup(int chatid, int admin) {
+        String sql = "INSERT INTO chat_group (chat_id,admin) VALUES (?,?)";
+    	PreparedStatement pstmt;
+		try {
+			pstmt = this.conn.prepareStatement(sql);
 	        // Set values for parameters
-        	pstmt.setInt(1, chatId);
-        	pstmt.setInt(2, usr1);
+	    	pstmt.setInt(1, chatid);
+	    	pstmt.setInt(2, admin);
 	        
-            // Executing the insert statement
-            int rowsAffected = pstmt.executeUpdate();
-            
-            // Checking if the insertion was successful
-            if (rowsAffected == 1) {
-            	System.out.println("New chat ID:");
-            }
-            
-            sql = "INSERT INTO chat_membership (chat_id,user_id) VALUES (?,?)";
-        	pstmt = this.conn.prepareStatement(sql);
-	        // Set values for parameters
-        	pstmt.setInt(1, chatId);
-        	pstmt.setInt(2, usr2);
+	        // Executing the insert statement
+	        int rowsAffected = pstmt.executeUpdate();
 	        
-            // Executing the insert statement
-            rowsAffected = pstmt.executeUpdate();
-            
-            // Checking if the insertion was successful
-            if (rowsAffected == 1) {
-            	System.out.println("New chat ID:");
-            }
-	        
+	        if (rowsAffected == 1) {
+	        	System.out.println("New chat ID:");
+	        }
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return 0;
-		}
-		return 0;
-
+		}        
+        // Checking if the insertion was successful
 	}
 	
 	
+	private void insertUserToChat(int chatId, int userId) {
+        String sql = "INSERT INTO chat_membership (chat_id,user_id) VALUES (?,?)";
+    	PreparedStatement pstmt;
+		try {
+			pstmt = this.conn.prepareStatement(sql);
+	        // Set values for parameters
+	    	pstmt.setInt(1, chatId);
+	    	pstmt.setInt(2, userId);
+	        
+	        // Executing the insert statement
+	        int rowsAffected = pstmt.executeUpdate();
+	        
+	        if (rowsAffected == 1) {
+	        	System.out.println("New chat ID:");
+	        }
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}        
+        // Checking if the insertion was successful
+	}
+	
+	public void addUsersToChat(int[] usr, int chatId) {
+		
+		System.out.println("Adding users to the chat...");
+		
+		for(int u:usr) {
+			insertUserToChat(u, chatId);	
+		}
+
+	}
+	
+	public int createGroup(String name, int[] users, int admin) {
+		
+		// 1) Crear nueva entrada en tabla chat
+		int chatid = createChat(name);
+		// 2) Crear nueva entrada en tabla grupo, asociada a chat
+		insertGroup(chatid, admin);
+		// 3) addUsers to chat
+		insertUserToChat(admin, chatid);
+		addUsersToChat(users, chatid);
+		
+		return chatid;
+	}
 	
 	// nuestra interfaz que crea un nuevo chat inserte una nueva entrada 
 	// a la tabla de chats
