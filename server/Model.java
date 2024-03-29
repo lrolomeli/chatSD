@@ -28,36 +28,11 @@ public class Model {
 		{
 			return 0;
 		}
-
 	}
 	
 	public int openChat(int arg0, int arg1) {
-		
-		int chatid = 0;
-		chatid = this.db.chatExist(arg0, arg1);
-		
-		if(0 == chatid) {
-			chatid = this.db.createChat(""+arg0+","+arg1+"");
-			// si no existe el chat debe crearse
-			int[] users = new int[2];
-			users[0] = arg0;
-			users[1] = arg1;
-			System.out.println(chatid);
-			if(0 != chatid) {
-				this.db.addUsersToChat(users, chatid);
-				return chatid;
-			}
-			else {
-				System.out.println("No se ha podido crear el chat");
-				return 0;
-			}
-		}
-		else {
-			return chatid;
-		}
-
+		return this.db.openChat(arg0, arg1);
 	}
-	
 
 	public int createGroup(String name, int[] users, int admin) {
 		return this.db.createGroup(name, users, admin);

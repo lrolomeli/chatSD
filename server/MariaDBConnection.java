@@ -181,7 +181,7 @@ public class MariaDBConnection {
         // Checking if the insertion was successful
 	}
 	
-	public void addUsersToChat(int[] usr, int chatId) {
+	private void addUsersToChat(int[] usr, int chatId) {
 		
 		System.out.println("Adding users to the chat...");
 		
@@ -193,7 +193,7 @@ public class MariaDBConnection {
 	
 	// nuestra interfaz que crea un nuevo chat inserte una nueva entrada 
 	// a la tabla de chats
-	public int createChat(String chatName) {
+	private int createChat(String chatName) {
 		
 		System.out.println("Creating new chat...");
 		
@@ -231,20 +231,7 @@ public class MariaDBConnection {
 
 	}
 	
-	public int createGroup(String name, int[] users, int admin) {
-		
-		// 1) Crear nueva entrada en tabla chat
-		int chatid = createChat("users:"+users+":admin:"+admin);
-		// 2) Crear nueva entrada en tabla grupo, asociada a chat
-		insertGroup(name, chatid, admin);
-		// 3) addUsers to chat
-		insertUserToChat(admin, chatid);
-		addUsersToChat(users, chatid);
-		
-		return chatid;
-	}
-	
-	public int chatExist(int user1, int user2) {		
+	private int chatExist(int user1, int user2) {		
 		
 		// busca si hay un chat creado para estos usuarios
 		String sql = "SELECT cm1.chat_id FROM chat_membership cm1 JOIN chat_membership cm2 ON cm1.chat_id = cm2.chat_id WHERE cm1.user_id =? AND cm2.user_id =?";
@@ -270,6 +257,44 @@ public class MariaDBConnection {
 			return 0;
 		}
 		return 0;
+	}
+	
+	public int openChat(int usr1, int usr2) {
+		int chatid = 0;
+		chatid = chatExist(usr1, usr2);
+		
+		if(0 == chatid) {
+			chatid = createChat(""+usr1+","+usr2+"");
+			// si no existe el chat debe crearse
+			int[] users = new int[2];
+			users[0] = usr1;
+			users[1] = usr2;
+			System.out.println(chatid);
+			if(0 != chatid) {
+				addUsersToChat(users, chatid);
+				return chatid;
+			}
+			else {
+				System.out.println("No se ha podido crear el chat");
+				return 0;
+			}
+		}
+		else {
+			return chatid;
+		}
+	}
+	
+	public int createGroup(String name, int[] users, int admin) {
+		
+		// 1) Crear nueva entrada en tabla chat
+		int chatid = createChat("users:"+users+":admin:"+admin);
+		// 2) Crear nueva entrada en tabla grupo, asociada a chat
+		insertGroup(name, chatid, admin);
+		// 3) addUsers to chat
+		insertUserToChat(admin, chatid);
+		addUsersToChat(users, chatid);
+		
+		return chatid;
 	}
 	
 	public boolean insertMessage(String message, int userId, int chatId) {		
@@ -358,10 +383,9 @@ public class MariaDBConnection {
 	public int readUserId(String user) {
 
 		System.out.println("Buscando ID...");
-		//Mandar llamar funcion de UserExist , si el usuario existe:
 		
         // SQL query to read data into the table
-		String sql = "SELECT id_user FROM user WHERE username = ?;";
+		String sql = "SELECT id_user FROM user WHERE username = ?";
         PreparedStatement stmt;
 		try {
 			stmt = this.conn.prepareStatement(sql);
