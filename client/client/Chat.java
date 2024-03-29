@@ -65,16 +65,20 @@ public class Chat {
 		
 	}
 	
-	public void sendMsgTo() {
+	public int sendMsgTo() {
 		String msg;
 		int who;
 		who = this.v.whoToTalk();
+		if(0 == who) {
+			return 0;
+		}
 		this.cchatid = this.c.getChatId(this.userId,who);
 		msg = this.v.askForMsg();
 		System.out.println("receptor "+who);
 		System.out.println("chatid "+this.cchatid);
 		System.out.println("transmisor "+this.userId);
 		this.c.sendMessage(this.aes.encrypt(msg), this.userId, this.cchatid);
+		return 1;
 	}
 	
 	
@@ -133,19 +137,71 @@ public class Chat {
 		System.out.println("chatid: "+this.cchatid);
 	}
 	
-	public void startApp() {
+	public void goodbye() {
+		this.v.sayGoodBye(this.user);
+		changeStatus(this.userId,false);	
+	}
+	
+	private int chat_menu() {
 		
-		register();
-		if(login()) {
+		this.v.printChatMenu();
+		
+		String action = this.v.getAction();
+
+		if(action.equals("1")) {
+			String name = this.v.askGroupName();
+			int[]userList = this.v.getUserList();
+			this.c.createGroup(name, userList, this.userId);
+		}
+		else if(action.equals("2")) {
 			getUsers();
-			changeStatus(getUserId(),true);
 			sendMsgTo();
 			getMessages();
-			
 		}
 		else {
-			
 		}
+		return 0;
+
+	}
+	
+	public int menu() {
+		
+		this.v.printMenu();
+		
+		String action = this.v.getAction();
+
+		if(action.equals("1")) {
+			int x=0;
+			if(login()) {
+				changeStatus(getUserId(),true);
+				do {
+
+					x = chat_menu();
+					
+				} while(0 != x);
+				goodbye();
+				return 0;
+			}
+			else {
+				return 0;
+			}
+		}
+		else if(action.equals("2")) {
+			register();
+			
+			return 0;
+		}
+		else {
+			return 1;
+		}
+	}
+	
+	public void startApp() {
+		int x = 0;
+		do {
+			x = menu();
+		}while(0 == x);
+
 	}
 	
 	

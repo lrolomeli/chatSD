@@ -132,39 +132,6 @@ public class MariaDBConnection {
 
 	}
 	
-	
-	public int openChatGroup(int user_id, String chat_name) {
-
-		String sql = "SELECT chat_id FROM chat WHERE chat_name=?";
-		PreparedStatement stmt;
-		
-		// Buscaremos si existe un chat_id asociado a ese nombre
-		// En caso de existir veremos si el usuario ya se encuentra registrado en el grupo
-		// Si esta registrado devolvemos el chat_id
-		// Si no esta registrado lo registramos y devolvemos el chat_id
-		// si existe el chat debemos crear el chat y agregar ese usuario al grupo
-	
-		try {
-			
-			stmt = this.conn.prepareStatement(sql);
-			// Set values for parameters
-			stmt.setString(2, chat_name);
-			
-	        ResultSet rs = stmt.executeQuery();
-	        
-	        if (rs.next()) {
-	            //Display values
-	        	return rs.getInt("chat_id");   
-	        }
-	    
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return 0;
-		}
-		return 0;
-	}
-	
 
 	private void insertGroup(int chatid, int admin) {
         String sql = "INSERT INTO chat_group (chat_id,admin) VALUES (?,?)";
@@ -190,7 +157,7 @@ public class MariaDBConnection {
 	}
 	
 	
-	private void insertUserToChat(int chatId, int userId) {
+	private void insertUserToChat(int userId, int chatId) {
         String sql = "INSERT INTO chat_membership (chat_id,user_id) VALUES (?,?)";
     	PreparedStatement pstmt;
 		try {
@@ -221,19 +188,6 @@ public class MariaDBConnection {
 			insertUserToChat(u, chatId);	
 		}
 
-	}
-	
-	public int createGroup(String name, int[] users, int admin) {
-		
-		// 1) Crear nueva entrada en tabla chat
-		int chatid = createChat(name);
-		// 2) Crear nueva entrada en tabla grupo, asociada a chat
-		insertGroup(chatid, admin);
-		// 3) addUsers to chat
-		insertUserToChat(admin, chatid);
-		addUsersToChat(users, chatid);
-		
-		return chatid;
 	}
 	
 	// nuestra interfaz que crea un nuevo chat inserte una nueva entrada 
@@ -276,6 +230,18 @@ public class MariaDBConnection {
 
 	}
 	
+	public int createGroup(String name, int[] users, int admin) {
+		
+		// 1) Crear nueva entrada en tabla chat
+		int chatid = createChat(name);
+		// 2) Crear nueva entrada en tabla grupo, asociada a chat
+		insertGroup(chatid, admin);
+		// 3) addUsers to chat
+		insertUserToChat(admin, chatid);
+		addUsersToChat(users, chatid);
+		
+		return chatid;
+	}
 	
 	public int openChat(int user1, int user2) {		
 		
