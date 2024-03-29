@@ -14,8 +14,19 @@ public class View {
 	public int whoToTalk() {
 
         System.out.print("Who you want to talk to: ");
-        int dest = Integer.valueOf(this.input.nextLine());
-		return dest;
+        try {
+        	int dest = Integer.valueOf(this.input.nextLine());
+        	return dest;
+        }catch(Exception e){
+        	System.out.println("No es una entrada valida");
+        	return 0;
+        }
+	}
+	
+	public String askGroupName() {
+        System.out.print("Enter the name of the group: ");
+        String msg = this.input.nextLine();
+        return msg;
 	}
 	
 	public String askForMsg() {
@@ -53,9 +64,67 @@ public class View {
         return pass;
 	}
 	
-	public void printUsers(String users) {
+	public void sayGoodBye(String user) {
+		System.out.println("Hasta Luego "+user);
+	}
+	
+	private boolean verifyList(String users) {
+		return true;
+	}
+	
+	public int[] getUserList() {
+		
+        System.out.print("Cuales usuarios (ID's) seran parte del grupo: ");
+        String userlist = this.input.nextLine();
+        if(verifyList(userlist)) {
+    		String[] users = userlist.split(",");
+    		
+    		int[] usrArr = new int[users.length];
+    		
+    		for(int i=0;i<users.length;i++) {
+    			usrArr[i] = Integer.valueOf(users[i]);
+    		}
+    		
+        	return usrArr;
+        }
+        else {
+        	return null;	
+        }
+		
+	}
+	
+	public String getAction() {
+		return this.input.nextLine();
+	}
+	
+	public void printMenu(/*String[] opt*/) {
+		//String menu = "";
+		//for(o : opt){
+		// menu += o;
+		// menu += "\n";		
+		//}
+		System.out.println("1) Login");
+		System.out.println("2) Register");
+		System.out.println("X) Salir");
+	}
+	
+	public void printChatMenu(/*String[] opt*/) {
+		//String menu = "";
+		//for(o : opt){
+		// menu += o;
+		// menu += "\n";		
+		//}
+		System.out.println("1) Crear Grupo");
+		System.out.println("2) Hablar con");
+		System.out.println("3) Hablar a grupo");
+		System.out.println("X) Salir");
+	}
+	
+	
+	
+	public void printList(String items) {
 
-        System.out.print(users);
+        System.out.print(items);
 
 	}
 	
