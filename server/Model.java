@@ -21,7 +21,7 @@ public class Model {
 		if(null == dbpass) {
 			return 0;
 		}
-		else if(dbpass.equals(password)){
+		else if(decryptText(dbpass).equals(decryptText(password))){
 			return this.db.readUserId(user);
 		}
 		else
@@ -32,30 +32,35 @@ public class Model {
 	}
 	
 	public int openChat(int arg0, int arg1) {
-		// busca si hay un chat creado para estos usuarios
-		int chatid = this.db.openChat(arg0, arg1);
-		// si lo hay regresa un id diferente a cero.
-		if(0 != chatid) {
-			// Dado que el chat existe cargar los mensajes del chat
-			return chatid;
-			
-		}
-		else
-		{
+		
+		int chatid = 0;
+		chatid = this.db.chatExist(arg0, arg1);
+		
+		if(0 == chatid) {
+			chatid = this.db.createChat(""+arg0+","+arg1+"");
 			// si no existe el chat debe crearse
-			String u1u2 = String.valueOf(arg0)+String.valueOf(arg1);
-			chatid = this.db.createChat(u1u2);
+			int[] users = new int[2];
+			users[0] = arg0;
+			users[1] = arg1;
 			System.out.println(chatid);
 			if(0 != chatid) {
-				this.db.addUsersToChat(arg0, arg1, chatid);
+				this.db.addUsersToChat(users, chatid);
 				return chatid;
 			}
 			else {
-				System.out.println("No se ha podido crear el chat, consulte a su medico");
+				System.out.println("No se ha podido crear el chat");
 				return 0;
 			}
 		}
+		else {
+			return chatid;
+		}
 
+	}
+	
+
+	public int createGroup(String name, int[] users, int admin) {
+		return this.db.createGroup(name, users, admin);
 	}
 	
 	public boolean sendMessage(String msg, int sender, int chatId) {
@@ -64,6 +69,10 @@ public class Model {
 	
 	public String userStatus() {
 		return this.db.readUsers();
+	}
+	
+	public String getGroups() {
+		return this.db.whatGroups();
 	}
 	
 	public String loadMess(int chat) {

@@ -38,12 +38,46 @@ public class MariaDBConnection {
         }
     }
 
-    public void checkForNewMessages(int userId) {
+	public String readMessages(int chatId) {
+		System.out.println("Buscando Mensajes...");
+		String msgs="";
+        // SQL query to read data into the table
+		String sql = "SELECT * FROM message WHERE chat_id=? LIMIT 10";
+        PreparedStatement stmt;
+		try {
+			
+			stmt = this.conn.prepareStatement(sql);
+	        // Set values for parameters
+			stmt.setInt(1, chatId);
+			
+	        ResultSet rs = stmt.executeQuery();
+	        
+	        while (rs.next()) {
+	            //Display values
+	        	String sender_id = rs.getString("sender_id");
+	        	String message_text = rs.getString("message_text");
+	            msgs += "" + sender_id + ":" + message_text + "\n"; 
+	        }
+	        System.out.println(msgs);
+	        //return pass;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+
+		return msgs;
+	}
+    
+    public String checkForNewMessages(int userId) {
         try {
+        	// checa la ultima vez que reviso sus mensajes el usuario
             long lastCheckTimestamp = lastCheckTimestamps.getOrDefault(userId, 0L);
 
             // Query for new messages since the last check timestamp
-            String query = "SELECT * FROM message WHERE user_id = ? AND timestamp > ?";
+            // si los reviso hace 5 minutos el siguiente query debe devolver los mensajes
+            // que hayan llegado en estos 5 minutos
+            String query = "SELECT * FROM message WHERE sender_id = ? AND timestamp > ?";
             PreparedStatement statement = this.conn.prepareStatement(query);
             statement.setInt(1, userId);
             statement.setTimestamp(2, new Timestamp(lastCheckTimestamp));
@@ -52,15 +86,21 @@ public class MariaDBConnection {
             while (resultSet.next()) {
                 // Process new messages
                 int messageId = resultSet.getInt("message_id");
-                String messageContent = resultSet.getString("content");
+                String messageContent = resultSet.getString("message_text");
                 System.out.println("New message (ID: " + messageId + "): " + messageContent);
+                
+                return null;
             }
 
-            // Update last check timestamp
+            // La ultima vez que revise si habia mensajes nuevos para mi
+            // efectivamente estoy checando si hay mensajes nuevos para este usuario
+            // cada cuanto? 30 segundos podria ser 
             lastCheckTimestamps.put(userId, System.currentTimeMillis());
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
+        return null;
     }
     
 	public boolean storeUserInDB(String user, String password) {
@@ -92,85 +132,64 @@ public class MariaDBConnection {
 
 	}
 	
-	
-	public int openChatGroup(int user_id, String chat_name) {
 
-		String sql = "SELECT chat_id FROM chat WHERE chat_name=?";
-		PreparedStatement stmt;
-		
-		// Buscaremos si existe un chat_id asociado a ese nombre
-		// En caso de existir veremos si el usuario ya se encuentra registrado en el grupo
-		// Si esta registrado devolvemos el chat_id
-		// Si no esta registrado lo registramos y devolvemos el chat_id
-		// si existe el chat debemos crear el chat y agregar ese usuario al grupo
-	
+	private void insertGroup(String name, int chatid, int admin) {
+        String sql = "INSERT INTO chat_group (group_name,chat_id,admin) VALUES (?,?,?)";
+    	PreparedStatement pstmt;
 		try {
-			
-			stmt = this.conn.prepareStatement(sql);
-			// Set values for parameters
-			stmt.setString(2, chat_name);
-			
-	        ResultSet rs = stmt.executeQuery();
+			pstmt = this.conn.prepareStatement(sql);
+	        // Set values for parameters
+			pstmt.setString(1, name);
+	    	pstmt.setInt(2, chatid);
+	    	pstmt.setInt(3, admin);
 	        
-	        if (rs.next()) {
-	            //Display values
-	        	return rs.getInt("chat_id");   
+	        // Executing the insert statement
+	        int rowsAffected = pstmt.executeUpdate();
+	        
+	        if (rowsAffected == 1) {
+	        	System.out.println("New chat ID:");
 	        }
-	    
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return 0;
-		}
-		return 0;
+		}        
+        // Checking if the insertion was successful
 	}
 	
-	public int addUsersToChat(int usr1, int usr2, int chatId) {
+	
+	private void insertUserToChat(int userId, int chatId) {
+        String sql = "INSERT INTO chat_membership (chat_id,user_id) VALUES (?,?)";
+    	PreparedStatement pstmt;
+		try {
+			pstmt = this.conn.prepareStatement(sql);
+	        // Set values for parameters
+	    	pstmt.setInt(1, chatId);
+	    	pstmt.setInt(2, userId);
+	        
+	        // Executing the insert statement
+	        int rowsAffected = pstmt.executeUpdate();
+	        
+	        if (rowsAffected == 1) {
+	        	System.out.println("New chat ID:");
+	        }
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}        
+        // Checking if the insertion was successful
+	}
+	
+	public void addUsersToChat(int[] usr, int chatId) {
 		
 		System.out.println("Adding users to the chat...");
 		
-        // SQL query to insert data into the table
-        String sql = "INSERT INTO chat_membership (chat_id,user_id) VALUES (?,?)";
-        PreparedStatement pstmt;
-		
-        try {
-        	pstmt = this.conn.prepareStatement(sql);
-	        // Set values for parameters
-        	pstmt.setInt(1, chatId);
-        	pstmt.setInt(2, usr1);
-	        
-            // Executing the insert statement
-            int rowsAffected = pstmt.executeUpdate();
-            
-            // Checking if the insertion was successful
-            if (rowsAffected == 1) {
-            	System.out.println("New chat ID:");
-            }
-            
-            sql = "INSERT INTO chat_membership (chat_id,user_id) VALUES (?,?)";
-        	pstmt = this.conn.prepareStatement(sql);
-	        // Set values for parameters
-        	pstmt.setInt(1, chatId);
-        	pstmt.setInt(2, usr2);
-	        
-            // Executing the insert statement
-            rowsAffected = pstmt.executeUpdate();
-            
-            // Checking if the insertion was successful
-            if (rowsAffected == 1) {
-            	System.out.println("New chat ID:");
-            }
-	        
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return 0;
+		for(int u:usr) {
+			insertUserToChat(u, chatId);	
 		}
-		return 0;
 
 	}
-	
-	
 	
 	// nuestra interfaz que crea un nuevo chat inserte una nueva entrada 
 	// a la tabla de chats
@@ -212,10 +231,22 @@ public class MariaDBConnection {
 
 	}
 	
-	
-	public int openChat(int user1, int user2) {		
+	public int createGroup(String name, int[] users, int admin) {
 		
-
+		// 1) Crear nueva entrada en tabla chat
+		int chatid = createChat("users:"+users+":admin:"+admin);
+		// 2) Crear nueva entrada en tabla grupo, asociada a chat
+		insertGroup(name, chatid, admin);
+		// 3) addUsers to chat
+		insertUserToChat(admin, chatid);
+		addUsersToChat(users, chatid);
+		
+		return chatid;
+	}
+	
+	public int chatExist(int user1, int user2) {		
+		
+		// busca si hay un chat creado para estos usuarios
 		String sql = "SELECT cm1.chat_id FROM chat_membership cm1 JOIN chat_membership cm2 ON cm1.chat_id = cm2.chat_id WHERE cm1.user_id =? AND cm2.user_id =?";
 		PreparedStatement stmt;
 		
@@ -269,36 +300,6 @@ public class MariaDBConnection {
 		return false;
 	}
 	
-	public String readMessages(int chatId) {
-		System.out.println("Buscando Mensajes...");
-		String msgs="";
-        // SQL query to read data into the table
-		String sql = "SELECT * FROM message WHERE chat_id=? ORDER BY timestamp ASC";
-        PreparedStatement stmt;
-		try {
-			stmt = this.conn.prepareStatement(sql);
-	        // Set values for parameters
-			stmt.setInt(1, chatId);
-			
-	        ResultSet rs = stmt.executeQuery();
-	        
-	        while (rs.next()) {
-	            //Display values
-	        	String sender_id = rs.getString("sender_id");
-	        	String message_text = rs.getString("message_text");
-	            msgs += "\n" + sender_id + ":" + message_text;   
-	        }
-	        System.out.println(msgs);
-	        //return pass;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-
-		return msgs;
-	}
-	
 	public String readUsers() {
 		System.out.println("Looking for users...");
 		String users = "";
@@ -327,6 +328,31 @@ public class MariaDBConnection {
 		}
 		
 		return users;
+	}
+	
+	public String whatGroups() {
+		System.out.println("Looking for groups...");
+		String groups = "";
+		// SQL query to insert data into the table
+		String sql = "SELECT chat_id,group_name FROM chat_group";
+		PreparedStatement stmt;
+		try {
+			stmt = this.conn.prepareStatement(sql);
+			// Set values for parameters
+			ResultSet rs = stmt.executeQuery();
+		
+			while (rs.next()) {
+				//Display values
+				int chatId = rs.getInt("chat_id");
+				String groupname = rs.getString("group_name");
+				groups += "("+chatId+") Group: " + groupname + "\n";
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		return groups;
 	}
 	
 	public int readUserId(String user) {

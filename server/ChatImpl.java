@@ -48,4 +48,15 @@ public class ChatImpl extends UnicastRemoteObject implements ChatInterface{
 	public boolean changeStatus(int arg0, boolean st) throws RemoteException {
 		return this.m.changeStatus(arg0, st);
 	}
+
+	@Override
+	public int createGroup(String arg0, int[] arg1, int arg2) throws RemoteException {
+		return this.m.createGroup(arg0, arg1, arg2);
+	}
+
+	@Override
+	public String getGroups() throws RemoteException {
+		return this.m.getGroups();
+	}
+
 }
