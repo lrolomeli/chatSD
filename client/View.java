@@ -2,12 +2,14 @@ package client;
 
 import java.io.Console;
 import java.util.Scanner;
+import client.view.InitFrame;
 
 public class View {
 
 	private Scanner input;
 	
 	public View() {
+		new InitFrame();
 		this.input = new Scanner(System.in);
 	}
 	

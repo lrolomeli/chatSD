@@ -1,5 +1,7 @@
 package client;
 
+import javax.swing.SwingUtilities;
+
 public class Chat {
 	
 	private Client c;
@@ -212,11 +214,17 @@ public class Chat {
 	
 	
 	public static void main(String[] args) {
-		Chat chat = new Chat();
-		if(chat.connectApp())
-		{
-			chat.startApp();
-		}
+		
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+        		Chat chat = new Chat();
+        		if(chat.connectApp())
+        		{
+        			chat.startApp();
+        		}
+            }
+        });
 		
 	}
 	
