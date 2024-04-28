@@ -38,6 +38,26 @@ public class Model {
 		return this.db.createGroup(name, users, admin);
 	}
 	
+	public int deleteGroup(int chatid) {
+		return this.db.deleteGroup(chatid);
+	}
+	
+	public int removeUserFromGroup(int chatid, int userid) {
+		return this.db.removeUserFromGroup(chatid, userid);
+	}
+	
+	public int getAdmin(int chatid) {
+		return this.db.getAdmin(chatid);
+	}
+	
+	public boolean partOfGroup(int chatid, int userid) {
+		return this.db.partOfGroup(chatid, userid);
+	}
+	
+	public int addUserToGroup(int chatid, int userid) {
+		return this.db.addUserToGroup(chatid, userid);
+	}
+	
 	public boolean sendMessage(String msg, int sender, int chatId) {
 		return this.db.insertMessage(msg, sender, chatId);
 	}

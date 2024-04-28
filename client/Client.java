@@ -133,9 +133,69 @@ public class Client {
 		return 0;
 	}
 	
+	public int removeUserFromGroup(int chatid, int userid) {
+		try {
+			return this.chatRemObj.removeUserFromGroup(chatid, userid);
+			
+
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
+		return 0;
+	}
+	
+	public int addUserToGroup(int chatid, int userid) {
+		try {
+			return this.chatRemObj.addUserToGroup(chatid, userid);
+			
+
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
+		return 0;
+	}
+	
 	public int createGroup(String name, int[] users, int admin) {
 		try {
 			return this.chatRemObj.createGroup(name, users, admin);
+			
+
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
+		return 0;
+	}
+	
+	public int deleteGroup(int chatid) {
+		try {
+			return this.chatRemObj.deleteGroup(chatid);
+			
+
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
+		return 0;
+	}
+	
+	public boolean partOfGroup(int chatid, int userid) {
+		try {
+			return this.chatRemObj.partOfGroup(chatid, userid);
+			
+
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+	
+	public int getAdmin(int chatid) {
+		try {
+			return this.chatRemObj.getAdmin(chatid);
 			
 
 		} catch (RemoteException e) {

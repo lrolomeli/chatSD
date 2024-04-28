@@ -36,6 +36,19 @@ public interface ChatInterface extends Remote {
     // 3) se asocian los integrantes al grupo
     int createGroup(String name, int[] users, int admin) throws RemoteException;
     
+    // Borrar un grupo...
+    // 1) crea un chat
+    // 2) crea un chat grupal
+    // 3) se asocian los integrantes al grupo
+    int deleteGroup(int chatid) throws RemoteException;
+    
+    // Eliminar usuario del grupo...
+    int removeUserFromGroup(int chatid, int userid) throws RemoteException;
+    
+    // Agregar usuario al grupo...
+    int addUserToGroup(int chatid, int userid) throws RemoteException;
+    
+    
     // Busca los grupos existentes y devuelve un string con todos ellos
     String getGroups() throws RemoteException;
     
@@ -45,5 +58,12 @@ public interface ChatInterface extends Remote {
     
     // Esta funcion modifica el status del usuario en la base de datos
     boolean changeStatus(int user_id, boolean status) throws RemoteException;
+    
+    // Obtener el administrador del grupo...
+    int getAdmin(int chatid) throws RemoteException;
+    
+    // Verifica si el usuario es miembro del grupo...
+    boolean partOfGroup(int chatid, int userid) throws RemoteException;
+    
     
 }

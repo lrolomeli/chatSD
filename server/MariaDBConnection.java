@@ -297,6 +297,100 @@ public class MariaDBConnection {
 		return chatid;
 	}
 	
+	public int addUserToGroup(int chatid, int userid) {
+		//insert into chat_membership (chat_id, user_id) values (?,?) -> (this.cchatid, newUser)
+        String sql = "INSERT INTO chat_membership (chat_id, user_id) values (?,?)";
+    	PreparedStatement pstmt;
+		try {
+			pstmt = this.conn.prepareStatement(sql);
+	        // Set values for parameters
+			pstmt.setInt(1, chatid);
+			pstmt.setInt(2, userid);
+	        
+	        // Executing the insert statement
+	        pstmt.executeUpdate();
+	        
+	        System.out.println("Usuario "+userid+" Agregado al grupo "+chatid);
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}        
+        // Checking if the insertion was successful
+		
+		return 1;
+	}
+	
+	public int removeUserFromGroup(int chatid, int userid) {
+		//delete from chat_membership where chat_id=? and user_id=?
+        String sql = "DELETE FROM chat_membership WHERE chat_id=? and user_id=?";
+    	PreparedStatement pstmt;
+		try {
+			pstmt = this.conn.prepareStatement(sql);
+	        // Set values for parameters
+			pstmt.setInt(1, chatid);
+			pstmt.setInt(2, userid);
+	        
+	        // Executing the insert statement
+	        pstmt.executeUpdate();
+	        
+	        System.out.println("Usuario "+userid+" Eliminado");
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}        
+        // Checking if the insertion was successful
+		
+		return 1;
+	}
+	
+	public int deleteGroup(int chatid) {
+		// first delete all the users which belong to that group in chat_membership
+		// delete from chat_membership where chat_id=this.cchatid
+		// then delete the group in chat_group table
+		// delete from chat_group where chat_id= this.cchatid
+		// last but not least delete the chat from the chat table
+		// delete from chat where chat_id= this.cchatid
+        String sql = "DELETE FROM chat_membership WHERE chat_id=?";
+    	PreparedStatement pstmt;
+		try {
+			pstmt = this.conn.prepareStatement(sql);
+	        // Set values for parameters
+			pstmt.setInt(1, chatid);
+	        
+	        // Executing the insert statement
+	        pstmt.executeUpdate();
+	        
+	        sql = "DELETE FROM chat_group WHERE chat_id=?";
+	        
+			pstmt = this.conn.prepareStatement(sql);
+	        // Set values for parameters
+			pstmt.setInt(1, chatid);
+	        
+	        // Executing the insert statement
+	        pstmt.executeUpdate();
+	        
+	        sql = "DELETE FROM chat WHERE chat_id=?";
+	        
+			pstmt = this.conn.prepareStatement(sql);
+	        // Set values for parameters
+			pstmt.setInt(1, chatid);
+	        
+	        // Executing the insert statement
+	        pstmt.executeUpdate();
+	        
+	        System.out.println("Grupo Eliminado");
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}        
+        // Checking if the insertion was successful
+		
+		return chatid;
+	}
+	
 	public boolean insertMessage(String message, int userId, int chatId) {		
 
 		String sql = "INSERT INTO message (sender_id , chat_id,  message_text) VALUES (?,?,?)";
@@ -378,6 +472,74 @@ public class MariaDBConnection {
 		}
 		
 		return groups;
+	}
+	
+	public int getAdmin(int chatid) {
+
+		System.out.println("Buscando Admin...");
+		
+        // SQL query to read data into the table
+		// select admin from chat_group where chat_id=?
+		String sql = "SELECT admin FROM chat_group WHERE chat_id=?";
+        PreparedStatement stmt;
+		try {
+			stmt = this.conn.prepareStatement(sql);
+	        // Set values for parameters
+	        stmt.setInt(1, chatid);
+	        
+	        ResultSet rs = stmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            //Display values
+	        	int id = rs.getInt("admin");
+	            System.out.print("\nadmin_id:" + id  );
+	            return id;
+	        }
+	        //return pass;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return 0;
+		}
+
+		return 0;
+	}
+	
+	public boolean partOfGroup(int chatid, int userid) {
+
+		System.out.println("buscando usuario en grupo...");
+		
+        // SQL query to read data into the table
+		// select * chat_membership where chat_id=this.cchatid and user_id=this.userId
+		String sql = "SELECT chat_id FROM chat_membership WHERE chat_id=? and user_id=?";
+        PreparedStatement stmt;
+		try {
+			stmt = this.conn.prepareStatement(sql);
+	        // Set values for parameters
+	        stmt.setInt(1, chatid);
+	        stmt.setInt(2, userid);
+	        
+	        ResultSet rs = stmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            //Display values
+	        	int id = rs.getInt("chat_id");
+	            if(id == chatid) {
+	            	return true;
+	            }
+	            else
+	            {
+		            return false;
+	            }
+	        }
+	        //return pass;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
+		return false;
 	}
 	
 	public int readUserId(String user) {

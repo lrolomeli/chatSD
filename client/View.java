@@ -120,6 +120,13 @@ public class View {
 		System.out.println("X) Salir");
 	}
 	
+	public void printAdminMenu() {
+		System.out.println("Escribe el mensaje y presiona enter para entrar");
+		System.out.println("$) Borrar Grupo");
+		System.out.println("*) Agregar integrante al Grupo");
+		System.out.println("#) Eliminar integrante del Grupo");	
+	}
+	
 	
 	
 	public void printList(String items) {

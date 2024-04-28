@@ -56,18 +56,21 @@ public class Chat {
 		
 	}
 	
-	public int sendMsgTo() {
-		String msg;
+	
+	public void getChatId(boolean chatOrGroup) {
 		int who;
 		who = this.v.whoToTalk();
 		if(0 == who) {
-			return 0;
+			return;
 		}
-		this.cchatid = this.c.getChatId(this.userId,who);
-		msg = this.v.askForMsg();
-		//System.out.println("receptor "+who);
-		//System.out.println("chatid "+this.cchatid);
-		//System.out.println("transmisor "+this.userId);
+		if(chatOrGroup)
+			this.cchatid = this.c.getChatId(this.userId,who);
+		else
+			this.cchatid = who;
+	}
+	
+	public int sendMsg() {
+		String msg = this.v.askForMsg();
 		this.c.sendMessage(this.aes.encrypt(msg), this.userId, this.cchatid);
 		return 1;
 	}
@@ -138,6 +141,28 @@ public class Chat {
 		changeStatus(this.userId,false);	
 	}
 	
+	private void admin_menu(String act) {
+		if(act.equals("$")) {
+			this.c.deleteGroup(this.cchatid);
+		}
+		else if(act.equals("#")) {
+			getUsers();
+			System.out.println("A quien deseas eliminar");
+			int user = Integer.parseInt(this.v.getAction());
+			this.c.removeUserFromGroup(this.cchatid, user);
+		}
+		else if(act.equals("*")) {
+			getUsers();
+			System.out.println("A quien deseas agregar");
+			int newUser = Integer.parseInt(this.v.getAction());
+			
+			this.c.addUserToGroup(this.cchatid, newUser);
+		}
+		else {
+			sendMsg();
+		}
+	}
+	
 	private int chat_menu() {
 		
 		this.v.printChatMenu();
@@ -151,14 +176,39 @@ public class Chat {
 		}
 		else if(action.equals("2")) {
 			getUsers();
-			sendMsgTo();
+			getChatId(true);
 			getMessages();
+			sendMsg();
 			return 1;
 		}
 		else if(action.equals("3")){
 			getGroups();
-			sendMsgTo();
-			getMessages();
+			getChatId(false);
+			// comparar si el usuario es parte del grupo
+			// select * chat_membership where chat_id=this.cchatid and user_id=this.userId
+			boolean partOfGroup = this.c.partOfGroup(this.cchatid, this.userId);
+			if(partOfGroup)
+			{
+				getMessages();
+			}
+			else
+			{
+				System.out.println("Usted no es miembro de ese grupo");
+			}
+
+			int admin = this.c.getAdmin(this.cchatid);
+			if(this.userId == admin) {
+				this.v.printAdminMenu();
+				String act = this.v.getAction();
+				admin_menu(act);
+			}
+			
+			if(partOfGroup)
+			{
+				sendMsg();
+				
+			}
+
 			return 1;
 		
 		}

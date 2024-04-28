@@ -53,6 +53,31 @@ public class ChatImpl extends UnicastRemoteObject implements ChatInterface{
 	public int createGroup(String arg0, int[] arg1, int arg2) throws RemoteException {
 		return this.m.createGroup(arg0, arg1, arg2);
 	}
+	
+	@Override
+	public int deleteGroup(int arg0) throws RemoteException {
+		return this.m.deleteGroup(arg0);
+	}
+	
+	@Override
+	public int removeUserFromGroup(int arg0, int arg1) throws RemoteException {
+		return this.m.removeUserFromGroup(arg0, arg1);
+	}
+	
+	@Override
+	public int getAdmin(int arg0) throws RemoteException {
+		return this.m.getAdmin(arg0);
+	}
+	
+	@Override
+	public boolean partOfGroup(int arg0, int arg1) throws RemoteException {
+		return this.m.partOfGroup(arg0, arg1);
+	}
+	
+	@Override
+	public int addUserToGroup(int arg0, int arg1) throws RemoteException {
+		return this.m.addUserToGroup(arg0, arg1);
+	}
 
 	@Override
 	public String getGroups() throws RemoteException {
