@@ -27,8 +27,8 @@ public class MariaDBConnection {
         String hostname = "localhost";
         String port = "3306";
         String url = "jdbc:mariadb://" + hostname + ":" + port + "/" + database + "?useSSL=false";
-        String username = "luisrlp";
-        String password = "Continental2.";
+        String username = "luislomeli";
+        String password = "pelonsun";
         try {
         	this.lastCheckTimestamps = new HashMap<>();
             this.conn = DriverManager.getConnection(url, username, password);

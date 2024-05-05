@@ -15,7 +15,7 @@ public class Client {
 	}
 	
 	public boolean startClient() {
-		String serverAddress = "localhost";
+		String serverAddress = "192.168.100.248";
 		int serverPort = 50001;
 		
 		try {
